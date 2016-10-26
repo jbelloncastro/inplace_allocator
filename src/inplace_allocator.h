@@ -17,7 +17,6 @@ struct inplace_allocator {
 	inplace_allocator(void* arena, size_t size) :
 		_free(new (arena) free_node_base())
 	{
-        //LOG_FUNCTION;
         assert( size > sizeof(free_node_base) );
 
         size = size - sizeof(free_node_base) - sizeof(free_node);
@@ -28,12 +27,9 @@ struct inplace_allocator {
     inplace_allocator( const inplace_allocator<T>& other ) :
         _free( other._free )
     {
-        //LOG_FUNCTION;
     }
 
 	Tp* allocate( std::size_t n, const std::nothrow_t& tag ) noexcept {
-        //LOG_FUNCTION;
-
 		allocated_node* result = nullptr;
 		free_node_base* current_node = _free;
 		free_node* next_node = current_node->next();
@@ -66,16 +62,12 @@ struct inplace_allocator {
 	}
 
     Tp* allocate( std::size_t n ) {
-        //LOG_FUNCTION;
-
         Tp* ptr = allocate(n, std::nothrow);
         if( !ptr )
             throw std::bad_alloc();
     }
 
 	void deallocate( Tp* ptr, std::size_t n ) {
-        //LOG_FUNCTION;
-
 		std::less<free_node*> lowerThan;
 		free_node* returned = free_node::replace(allocated_node::from_ptr(ptr));
 

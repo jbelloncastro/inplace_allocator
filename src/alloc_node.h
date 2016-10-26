@@ -37,7 +37,6 @@ struct allocated_node {
 	allocated_node(size_t size) :
 		_size(size)
 	{
-        std::cout << "NEW allocated_node @ " << std::hex << this << std::endl;
 	}
 
 	size_t size() const {
@@ -65,7 +64,6 @@ struct free_node : public free_node_base {
 		free_node_base(),
 		_size(size)
 	{
-        std::cout << "NEW free_node @ " << std::hex << this << std::endl;
 	}
 
 	free_node(size_t size, free_node* next) :

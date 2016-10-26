@@ -1,6 +1,8 @@
 CC=g++
 CPPFLAGS=-I../src
-CXXFLAGS=-std=c++11 -O0 -g3 #-fsanitize=address
+#DEBUG=-O0 -g3 -fsanitize=address
+RELEASE=-O3 -march=native
+CXXFLAGS=-std=c++11 $(DEBUG) $(RELEASE)
 
 targets=\
  basic\
