@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <iostream>
 
-typedef fallback_allocator<int,std::allocator<int> > allocator;
+typedef fallback_allocator<int,std::allocator> allocator;
 //typedef inplace_allocator<int> allocator;
 
 constexpr size_t size = 100;

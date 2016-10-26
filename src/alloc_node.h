@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <cstddef>
+
 #include <new>
 
 struct free_node;
@@ -86,6 +87,8 @@ struct free_node : public free_node_base {
 	 * Assumes requested size does not exceed
 	 * free_node::_size (take into account allocated_node
 	 * overhead).
+	 * Make sure the amount of space requested is enough
+	 * to replace this node with a free_node of size 0
 	 */
 	allocated_node* split(size_t requested) {
 		_size -= requested + sizeof(allocated_node);
@@ -93,7 +96,7 @@ struct free_node : public free_node_base {
 	}
 
 	void try_join(free_node* node) {
-		free_node* next_immediate = (free_node*)data(_size);
+		free_node* next_immediate = free_node::from_ptr(data(_size));
 		if (node != next_immediate) {
 			insert_after(node);
 		} else {

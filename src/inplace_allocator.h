@@ -38,20 +38,23 @@ struct inplace_allocator {
 		free_node_base* current_node = _free;
 		free_node* next_node = current_node->next();
 
-		// Take in account node overheads
-		// with special care of negative numbers
-		const size_t requested = n * sizeof(Tp) + sizeof(allocated_node);
-		const size_t necessary = std::max<long>(0, requested - sizeof(free_node));
+		// Take in account node overheads. We must be able to restore
+		// an allocated_node into a free_node of at least size = 0
 
-		while (next_node && next_node->size() < necessary) {
+		// newSize: minimum size to split a free_node in two
+		const size_t newSize = n * sizeof(Tp) + sizeof(allocated_node);
+		// replaceSize: minimum size to replace a free_node with an allocated one
+		const size_t replaceSize = std::max( sizeof(free_node), newSize ) - sizeof(free_node);
+
+		while (next_node && next_node->size() < replaceSize) {
 			current_node = static_cast<free_node_base*>(next_node);
 			next_node = next_node->next();
 		}
 		if (next_node) {
 			// Found node
-			if (next_node->size() > requested) {
+			if (next_node->size() >= newSize) {
 				// Split when free space remains
-				result = next_node->split(requested-sizeof(allocated_node));
+				result = next_node->split(newSize);
 			}
 			else {
 				// Replace when no space left on node
