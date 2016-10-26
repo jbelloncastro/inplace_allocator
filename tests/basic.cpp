@@ -1,6 +1,8 @@
 
 #include "inplace_allocator.h"
 #include "fallback_allocator.h"
+
+#include <array>
 #include <cstdint>
 #include <iostream>
 

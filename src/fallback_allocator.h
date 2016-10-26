@@ -5,15 +5,17 @@
 #include "inplace_allocator.h"
 #include <type_traits>
 
-template <typename Tp, typename Allocator = std::allocator<Tp> >
+template <typename Tp, template<class> class Allocator = std::allocator >
 class fallback_allocator {
 public:
-    template <typename T, typename A>
+    typedef Tp value_type;
+
+    template <typename T>
     struct rebind {
-        typedef fallback_allocator<T,A> other;
+        typedef fallback_allocator<T,Allocator> other;
     };
 
-	fallback_allocator( void* arena, size_t size, Allocator fallback  = Allocator() ) :
+	fallback_allocator( void* arena, size_t size, Allocator<Tp> fallback  = Allocator<Tp>() ) :
 		_main(arena,size),
         _fallback(fallback),
         _begin(static_cast<uint8_t*>(arena)),
@@ -21,8 +23,8 @@ public:
 	{
 	}
 
-    template <typename T, typename A>
-    fallback_allocator( const fallback_allocator<T,A>& other ) :
+    template <typename T>
+    fallback_allocator( const fallback_allocator<T,Allocator>& other ) :
         _main( other._main ),
         _fallback( other._fallback ),
         _begin( other._begin ),
@@ -63,6 +65,9 @@ public:
 	}
 
 private:
+    template < typename T, template <class> class A >
+    friend struct fallback_allocator;
+
     bool fallback_allocated( Tp* ptr ) {
         // std::less<T*> required for memory order comparisons
         std::less<uint8_t*> lessThan;
@@ -74,7 +79,7 @@ private:
     inplace_allocator<Tp> _main;
     uint8_t*              _begin;
     uint8_t*              _end;
-    Allocator             _fallback;
+    Allocator<Tp>         _fallback;
 };
 
 #endif // FALLBACK_ALLOCATOR_H
