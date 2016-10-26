@@ -42,18 +42,14 @@ public:
 
     Tp* allocate( std::size_t n ) {
         Tp* result = _main.allocate(n, std::nothrow);
-        if( result ) {
-            return result;
-        } else {
-            Tp* fallback_result = nullptr;
-            fallback_result = _fallback.allocate(n);
+        if( !result ) {
+            result = _fallback.allocate(n);
 
-            if( fallback_result ) {
-                return fallback_result;
-            } else {
+            if( !result ) {
                 throw std::bad_alloc();
             }
         }
+        return result;
     }
 
 	void deallocate( Tp* ptr, std::size_t n ) {
